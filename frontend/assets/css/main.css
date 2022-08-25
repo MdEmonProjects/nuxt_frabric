@@ -1,0 +1,94 @@
+*{
+    outline: 0;
+}
+ul,ol{
+    list-style: none;
+}
+.display_image img{
+    width: 400px;
+}
+.controls {
+    display: block;
+}
+.display_image{
+    position: relative;
+}
+.product-color{
+    height: 30px;
+    width: 50px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.canvas-container {
+    position: absolute !important;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    left: 50%;
+}
+.noo_need{
+    opacity: 0;
+    visibility: hidden;
+}
+#canvas, #canvas1{
+    border: 2px dashed #000;
+}
+.radius-10{
+    border-radius: 10px !important;
+}
+.border-3{
+    border: 3px solid #000 !important;
+}
+.left_section_parent{
+    width: fit-content;
+}
+.middle_section{
+    width: 60%;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+#kitchen_font{
+    min-width: 200px;
+    border-radius: 5px;
+}
+.text-color,.text-bg-image{
+    height: 40px;
+    width: 40px;
+    border-radius: 5px;
+    cursor: pointer;
+    outline: none !important;
+}
+
+.shape-btn{
+    height: fit-content;
+    width: 24%;
+    max-width: 200px;
+    height: 100px;
+    display: inline-block;
+    /* background: #000; */
+    margin-right: 10px;
+    outline: none !important;
+}
+.shape-btn img{
+    width: 100%;
+    height: 100%;
+}
+.flex-no-wrap{
+    flex-wrap: nowrap !important;
+}
+.text-color.active, .text-bg-image.active{
+    border: 5px solid #000 !important;
+    
+}
+.shape-btn img{
+    pointer-events: none;
+}
+.shape-btn.active{
+    border: 3px solid #000;
+}
+#sub_canvas{
+    opacity: 0;
+}
+.bg_image_text{
+    max-width: 100px;
+    text-align: center;
+}
