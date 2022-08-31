@@ -167,12 +167,13 @@ export default {
         fabric.Object.prototype.transparentCorners = false;
 
         var fcanvas = new fabric.Canvas('canvas');
-        fcanvas.setDimensions({width:120, height:120});
+        fcanvas.setDimensions({width:150, height:150});
 
         
-        async function addNewImage(url,bgImage = null,scale = 0.2) {
+        async function addNewImage(url,scaleToWidth = 0.2,scaleToHeight = 0.2) {
             await fabric.Image.fromURL(url, function (oImg) {
-                oImg.scale(scale);
+                oImg.scaleToWidth(scaleToWidth);
+                oImg.scaleToHeight(scaleToHeight);
                 oImg.set({
                     'left': 20,
                 });
@@ -183,11 +184,11 @@ export default {
                 fcanvas.add(oImg);
                 
             });
-            if(bgImage){
-                fcanvas.setBackgroundImage(bgImage, function() {
-                    fcanvas.renderAll();
-                });
-            }
+            // if(bgImage){
+            //     fcanvas.setBackgroundImage(bgImage, function() {
+            //         fcanvas.renderAll();
+            //     });
+            // }
             
             await fcanvas.renderAll();
             // var dump = new Image();
@@ -213,8 +214,9 @@ export default {
         })
 
         async function postReq(option) {
+            console.log("home comming");
             let image = await axios.post('http://localhost:4000/api', option)
-
+            await $("#add-to-canvas").prop('disabled', false)
             return image;
         }
 
@@ -222,6 +224,7 @@ export default {
             let activeObj = fcanvas.getActiveObjects();
             //get text
             let inputText = await $("#text").val();
+            $("#add-to-canvas").prop('disabled', true)
             //get active font family
             
             // console.log(fontFamilyName);
@@ -239,113 +242,113 @@ export default {
             } else if (fontFamilyName = '') {
                 alert("Plaease add font family");
             } 
-            else if (textForegroundColor == undefined) {
+            else {
                 var fontFamilyName = await $("#kitchen_font").val();
                 if (textShape == "lineBtn") {
-                    let res = await postReq({textShape,inputText,fontFamilyName,textForegroundColor: null});
+                    let res = await postReq({textShape,inputText,fontFamilyName,textForegroundColor,textBackgroundImage});
                     setTimeout(()=>{
-                       addNewImage(res.data,textBackgroundImage);
+                       addNewImage(res.data,3,10);
                     },1000)
                 } 
                 else if (textShape == "foo") {
-                    let res = await postReq({textShape,inputText,fontFamilyName,diameter: 200,flip: true,textForegroundColor: null}) ;
+                    let res = await postReq({textShape,inputText,fontFamilyName,diameter: 200,flip: true,textForegroundColor,textBackgroundImage}) ;
                     setTimeout(()=>{
-                       addNewImage(res.data,textBackgroundImage,0.1);
+                       addNewImage(res.data,50,20);
                     },1000)
                 } 
                 else if (textShape == "foo-turn") {
-                    let res = await postReq({textShape,inputText,fontFamilyName,diameter: 260,flip: false,textForegroundColor: null}) 
+                    let res = await postReq({textShape,inputText,fontFamilyName,diameter: 260,flip: false,textForegroundColor,textBackgroundImage}) 
                      setTimeout(()=>{
-                       addNewImage(res.data,textBackgroundImage);
+                       addNewImage(res.data,50,20);
                     },1000)
                 } 
                 else if (textShape == "foo-2") {
-                    let res = await postReq({textShape,inputText,fontFamilyName,diameter: 120,flip: false,textForegroundColor: null}) 
+                    let res = await postReq({textShape,inputText,fontFamilyName,diameter: 120,flip: false,textForegroundColor,textBackgroundImage}) 
                      setTimeout(()=>{
-                       addNewImage(res.data,textBackgroundImage);
+                       addNewImage(res.data,50,50);
                     },1000)
                 }
                 else if (textShape == "foo-3") {
-                    let res = await postReq({textShape,inputText,fontFamilyName,textForegroundColor: null});
+                    let res = await postReq({textShape,inputText,fontFamilyName,textForegroundColor,textBackgroundImage});
                     setTimeout(()=>{
-                       addNewImage(res.data,textBackgroundImage);
+                       addNewImage(res.data,3,10);
                     },1000)
                 }
                 else if (textShape == "foo-perspective") {
-                    let res = await postReq({textShape,inputText,fontFamilyName,textForegroundColor: null});
+                    let res = await postReq({textShape,inputText,fontFamilyName,textForegroundColor,textBackgroundImage});
                     setTimeout(()=>{
-                       addNewImage(res.data,textBackgroundImage);
+                       addNewImage(res.data,3,10);
                     },1000)
                 }
                 else if (textShape == "foo-vally") {
-                    let res = await postReq({textShape,inputText,fontFamilyName,textForegroundColor: null});
+                    let res = await postReq({textShape,inputText,fontFamilyName,textForegroundColor,textBackgroundImage});
                     setTimeout(()=>{
-                       addNewImage(res.data,textBackgroundImage);
+                       addNewImage(res.data,3,10);
                     },1000)
                 }
                 else if (textShape == "foo-pinch") {
-                    let res = await postReq({textShape,inputText,fontFamilyName,textForegroundColor: null});
+                    let res = await postReq({textShape,inputText,fontFamilyName,textForegroundColor,textBackgroundImage});
                     setTimeout(()=>{
-                       addNewImage(res.data,textBackgroundImage);
+                       addNewImage(res.data,3,10);
                     },1000)
                 }
                 
 
             }
-            else if (textForegroundColor) {
+            /*else if (textForegroundColor) {
                 var fontFamilyName = await $("#kitchen_font").val();
                 if (textShape == "lineBtn") {
                     let res = await postReq({textShape,inputText,fontFamilyName,textForegroundColor});
                     setTimeout(()=>{
                        addNewImage(res.data,textBackgroundImage);
-                       console.log(res.data);
+                    //    console.log(res.data);
                     },1000)
                 } 
                 else if (textShape == "foo") {
                     let res = await postReq({textShape,inputText,fontFamilyName,diameter: 200,flip: true,textForegroundColor}) ;
                     setTimeout(()=>{
-                       addNewImage(res.data,textBackgroundImage);
+                       addNewImage(res.data);
                     },1000)
                 } 
                 else if (textShape == "foo-turn") {
                     let res = await postReq({textShape,inputText,fontFamilyName,diameter: 260,flip: false,textForegroundColor}) 
                      setTimeout(()=>{
-                       addNewImage(res.data,textBackgroundImage);
+                       addNewImage(res.data);
                     },1000)
                 } 
                 else if (textShape == "foo-2") {
                     let res = await postReq({textShape,inputText,fontFamilyName,diameter: 120,flip: false,textForegroundColor}) 
                      setTimeout(()=>{
-                       addNewImage(res.data,textBackgroundImage);
+                       addNewImage(res.data);
                     },1000)
                 }
                 else if (textShape == "foo-3") {
                     let res = await postReq({textShape,inputText,fontFamilyName,textForegroundColor});
                     setTimeout(()=>{
-                       addNewImage(res.data,textBackgroundImage);
+                       addNewImage(res.data);
                     },1000)
                 }
                 else if (textShape == "foo-perspective") {
                     let res = await postReq({textShape,inputText,fontFamilyName,textForegroundColor});
                     setTimeout(()=>{
-                       addNewImage(res.data,textBackgroundImage);
+                       addNewImage(res.data);
                     },1000)
                 }
                 else if (textShape == "foo-vally") {
                     let res = await postReq({textShape,inputText,fontFamilyName,textForegroundColor});
                     setTimeout(()=>{
-                       addNewImage(res.data,textBackgroundImage);
+                       addNewImage(res.data);
                     },1000)
                 }
                 else if (textShape == "foo-pinch") {
                     let res = await postReq({textShape,inputText,fontFamilyName,textForegroundColor});
                     setTimeout(()=>{
-                       addNewImage(res.data,textBackgroundImage);
+                       addNewImage(res.data);
                     },1000)
                 }
                 
 
-            }
+            }*/
 
         });
         /*$("#add-to-canvas").on('click', async function () {

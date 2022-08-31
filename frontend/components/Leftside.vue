@@ -2,7 +2,7 @@
     <div class="left_section_parent pl-2">
         <div class="display_image" id="download-canvas">
             <img src="5V00L-front.png" name="image-swap" />
-            <canvas id="canvas" width="200" height="200"></canvas>
+            <canvas id="canvas" width="300" height="300"></canvas>
         </div>
         
         

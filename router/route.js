@@ -308,8 +308,9 @@ fabric.CurvedText = fabric.util.createClass(fabric.Object, {
 fabric.CurvedText.fromObject = function (object, callback, forceAsync) {
    return fabric.Object._fromObject('CurvedText', object, callback, forceAsync, 'curved-text');
 };
+let str;
 
-function editObject(text, fName, diameterVal = 120, colorCode = "#333", flipped = false) {
+function editObject(text, image, fName, diameterVal = 120, colorCode = "#FFFFFF", flipped = false) {
    fcanvas.clear();
    fcanvas.setWidth(400);
    fcanvas.setHeight(400);
@@ -344,8 +345,39 @@ function editObject(text, fName, diameterVal = 120, colorCode = "#333", flipped 
    // stream.on('data', function (chunk) {
    //    out.write(chunk);
    // });
+   let shapeUrl = fcanvas.toDataURL()
+   if (image) {
+      fs.readFile(__dirname + '/pug_small.png', async function (err, data) {
+         if (err) throw err;
+         let carveDemo = Canvas.createCanvas(1400, 1400);
+         let ctx = carveDemo.getContext('2d');
+         var img = await new Canvas.Image; // Create a new Image
+         img.src = data;
+         await ctx.drawImage(img, carveDemo.width / 2 - 100 / 2, carveDemo.height / 2 + 100 / 2 - 30, 100, 100);
+         img.src = shapeUrl
+         await ctx.drawImage(img, carveDemo.width / 2 - 100 / 2, carveDemo.height / 2 + 100 / 2 - 30, 100, 100);
+         await cropImageFromCanvas(ctx);
+
+
+         let ssp = carveDemo.toDataURL("image/png").toString();
+         // fs.writeFile('helloworld.txt', ssp, async function (err) {
+         //    if (err) return console.log(err);
+         //    console.log('Hello World > helloworld.txt');
+         // });
+         // console.log(ssp);
+
+         str = ssp;
+      });
+
+
+   } else {
+      str = shapeUrl;
+   }
+
 
    return fcanvas.toDataURL();
+
+
 
 
 }
@@ -363,12 +395,23 @@ function Addtext(ss = "No text set", font = "lato", colorCode = "#333") {
    }));
 
    let getCanva = trimCanvas(fcanvas);
+   fs.readFile(__dirname + '/pug_small.png', async function (err, data) {
+      if (err) throw err;
+      var img = await new Canvas.Image; // Create a new Image
+      img.src = data;
+      console.log(w, img.width, textHeight);
+      await ctx.drawImage(img, w / 2 - 440 / 2, h / 2 + textHeight / 2 - 30, 440, textHeight);
+      // let ssp = demo.toDataURL("image/png").toString();
+
+      // str = ssp;
+   });
 
    return getCanva.toDataURL();
 }
 
-function renderBridgeText(iText = "Bridge Text", iTriangle = false, color = "#000000", fammily = "impact", curve = 70, offsetY = 4, textHeight = 100, bottom = 200) {
-   const demo = Canvas.createCanvas(1400, 1400)
+async function renderBridgeText(iText = "Bridge Text", image, iTriangle = false, color = "#000000", fammily = "impact", curve = 70, offsetY = 4, textHeight = 100, bottom = 200) {
+
+   const demo = Canvas.createCanvas(1400, 1400);
    let ctx = demo.getContext('2d');
    let font = '64px ' + fammily;
    let w = demo.width;
@@ -381,64 +424,84 @@ function renderBridgeText(iText = "Bridge Text", iTriangle = false, color = "#00
    let os = Canvas.createCanvas(400, 400);
    let octx = os.getContext('2d');
 
+   await fs.readFile(__dirname + '/pug_small.png', async function (err, data) {
+      if (err) {
+         throw err;
+      } else {
+         if (image) {
+            var img = await new Canvas.Image; // Create a new Image
+            img.src = data;
+            console.log(w, img.width, textHeight);
+            await ctx.drawImage(img, w / 2 - 440 / 2, h / 2 + textHeight / 2 - 30, 440, textHeight);
+
+         }
+
+         // 
+         while (i--) {
+            if (isTri) {
+               y += dltY;
+               if (i === (w * 0.5) | 0) dltY = -dltY;
+            } else {
+               y = bottom - curve * Math.sin(i * angleSteps * Math.PI / 180);
+            }
+            ctx.drawImage(os, i, 0, 1, textHeight,
+               i, h * 0.5 - offsetY / textHeight * y, 1, y);
+         }
+         await cropImageFromCanvas(ctx);
+
+         let ssp = demo.toDataURL("image/png").toString();
+         // fs.writeFile('helloworld.txt', ssp, async function (err) {
+         //    if (err) return console.log(err);
+         //    console.log('Hello World > helloworld.txt');
+         // });
+         str = ssp;
+      }
+   });
    os.width = w;
    os.height = h;
-
    octx.font = font;
    octx.textBaseline = 'top';
    octx.textAlign = 'center';
    isTri = iTriangle;
 
-   octx.clearRect(0, 0, w, h);
-   ctx.clearRect(0, 0, w, h);
+   await octx.clearRect(0, 0, w, h);
+   await ctx.clearRect(0, 0, w, h);
    octx.fillStyle = color;
-   octx.fillText(iText.toUpperCase(), w * 0.5, 0);
-
-   /// slide and dice
+   await octx.fillText(iText.toUpperCase(), w * 0.5, 0);
    i = w;
    dltY = curve / textHeight;
    y = 0;
-   while (i--) {
-      if (isTri) {
-         y += dltY;
-         if (i === (w * 0.5) | 0) dltY = -dltY;
-      } else {
-         y = bottom - curve * Math.sin(i * angleSteps * Math.PI / 180);
-      }
-      ctx.drawImage(os, i, 0, 1, textHeight,
-         i, h * 0.5 - offsetY / textHeight * y, 1, y);
-   }
-   cropImageFromCanvas(ctx);
-   // var dump = new Image();
-   // dump.src = "https://swiperjs.com/demos/images/nature-4.jpg";
-   // ctx.drawImage(dump,0,0);
-   return demo.toDataURL("image/png").toString();
-}
-let str;
 
-var text = new fabric.Text('GeeksforGeeks', {
-   fill: 'green'
-});
-fcanvas.add(text);
-fabric.Image.fromURL('http://fabricjs.com/assets/pug_small.jpg', function (myImg) {
-   //i create an extra var for to change some image properties
-   var img1 = myImg.set({
-      left: 0,
-      top: 0,
-      width: 150,
-      height: 150
-   });
-   fcanvas.add(img1);
-   
-   str = fcanvas.toDataURL("image/png").toString();
-   fs.writeFile('test.txt', str, err => {
-      if (err) {
-        console.error(err)
-        return
-      }
-      //file written successfully
-   })
-});
+   return demo.toDataURL("image/png").toString();
+
+
+}
+
+
+// var text = new fabric.Text('GeeksforGeeks', {
+//    fill: 'green'
+// });
+
+// fabric.Image.fromURL('http://fabricjs.com/assets/pug_small.jpg', function (myImg) {
+//    //i create an extra var for to change some image properties
+//    var img1 = myImg.set({
+//       left: 0,
+//       top: 0,
+//       width: 150,
+//       height: 150
+//    });
+//    fcanvas.add(img1);
+
+//    str = fcanvas.toDataURL("image/png").toString();
+//    fs.writeFile('test.txt', str, err => {
+//       if (err) {
+//         console.error(err)
+//         return
+//       }
+//       //file written successfully
+//    })
+// });
+// fcanvas.add(text);
 
 
 fabric.nodeCanvas.registerFont('text/Bakemono-Stereo-Extrabold-trial.ttf', {
@@ -479,65 +542,128 @@ fabric.nodeCanvas.registerFont('text/MADE-Sunflower.otf', {
 router.post('/api/', (req, res) => {
    contextsss.clearRect(0, 0, fcanvas.width, fcanvas.height);
    console.log(req.body);
-   if (!req.body.textForegroundColor) {
+   
       if (req.body.textShape == "foo") {
-         let data = editObject(req.body.inputText, "MagicRetro", req.body.diameter, '#00000', req.body.flip)
-         res.send(data);
+         let data = editObject(req.body.inputText,req.body.textBackgroundImage, "MagicRetro", req.body.diameter, req.body.textForegroundColor, req.body.flip);
+         // res.send(data);
+         setTimeout(() => {
+            // console.log(str);
+            res.send(str)
+         }, 8000)
       } else if (req.body.textShape == "foo-turn") {
-         let data = editObject(req.body.inputText, "MagicRetro", req.body.diameter, '#000000', req.body.flip);
-         res.send(data)
+         let data = editObject(req.body.inputText,req.body.textBackgroundImage, "MagicRetro", req.body.diameter, req.body.textForegroundColor, req.body.flip);
+         // res.send(data)
+         setTimeout(() => {
+            // console.log(str);
+            res.send(str)
+         }, 8000)
 
       } else if (req.body.textShape == "foo-2") {
-         let data = editObject(req.body.inputText, "MagicRetro", req.body.diameter, '#000000', req.body.flip);
-         res.send(data)
+         let data = editObject(req.body.inputText,req.body.textBackgroundImage, "MagicRetro", req.body.diameter, req.body.textForegroundColor, req.body.flip);
+         setTimeout(() => {
+            res.send(str)
+         }, 8000)
       } else if (req.body.textShape == "lineBtn") {
          // let data = Addtext(req.body.inputText, req.body.fontFamilyName);
-         let data = renderBridgeText(req.body.inputText, false, "#000", req.body.fontFamilyName)
-         res.send(data)
+         let data = renderBridgeText(req.body.inputText,req.body.textBackgroundImage, false, req.body.textForegroundColor, req.body.fontFamilyName)
+         setTimeout(() => {
+            // console.log(str);
+            res.send(str)
+         }, 8000)
       } else if (req.body.textShape == "foo-3") {
-         let data = renderBridgeText(req.body.inputText, false, "#000", req.body.fontFamilyName);
-         res.send(data)
+         let data = renderBridgeText(req.body.inputText,req.body.textBackgroundImage, false, req.body.textForegroundColor, req.body.fontFamilyName);
+         setTimeout(() => {
+            // console.log(str);
+            res.send(str)
+         }, 8000)
+
       } else if (req.body.textShape == "foo-perspective") {
-         let data = renderBridgeText(req.body.inputText, true, "#000000", req.body.fontFamilyName, 200, 50, 85, 0);
+         let data = renderBridgeText(req.body.inputText,req.body.textBackgroundImage, true, req.body.textForegroundColor, req.body.fontFamilyName, 200, 50, 85, 0);
          // console.log(data);
-         res.send(data)
+         // res.send(data)
+         setTimeout(() => {
+            // console.log(str);
+            res.send(str)
+         }, 8000)
       } else if (req.body.textShape == "foo-vally") {
-         let data = renderBridgeText(req.body.inputText, false, "#000000", req.body.fontFamilyName, 66, 51, 68, 200);
-         res.send(data)
+         let data = renderBridgeText(req.body.inputText,req.body.textBackgroundImage, false, req.body.textForegroundColor, req.body.fontFamilyName, 66, 51, 68, 200);
+         // res.send(data)
+         setTimeout(() => {
+            // console.log(str);
+            res.send(str)
+         }, 8000)
+
       } else if (req.body.textShape == "foo-pinch") {
-         let data = renderBridgeText(req.body.inputText, false, "#000000", req.body.fontFamilyName, 66, 20, 65, 190);
-         res.send(data)
+         let data = renderBridgeText(req.body.inputText,req.body.textBackgroundImage, false, req.body.textForegroundColor, req.body.fontFamilyName, 66, 20, 65, 190);
+         // res.send(data)
+         setTimeout(() => {
+            // console.log(str);
+            res.send(str)
+         }, 8000)
       }
-   } else if (req.body.textForegroundColor) {
+   
+   /*else if (req.body.textForegroundColor) {
       if (req.body.textShape == "foo") {
          let data = editObject(req.body.inputText, "MagicRetro", req.body.diameter, req.body.textForegroundColor, req.body.flip)
-         res.send(data);
+         // res.send(data);
+         setTimeout(() => {
+            // console.log(str);
+            res.send(str)
+         }, 8000)
       } else if (req.body.textShape == "foo-turn") {
          let data = editObject(req.body.inputText, "MagicRetro", req.body.diameter, req.body.textForegroundColor, req.body.flip);
-         res.send(data)
+         // res.send(data)
+         setTimeout(() => {
+            // console.log(str);
+            res.send(str)
+         }, 8000)
 
       } else if (req.body.textShape == "foo-2") {
          let data = editObject(req.body.inputText, "MagicRetro", req.body.diameter, req.body.textForegroundColor, req.body.flip);
-         res.send(data)
+         // res.send(data)
+         setTimeout(() => {
+            // console.log(str);
+            res.send(str)
+         }, 8000)
       } else if (req.body.textShape == "lineBtn") {
          // let data = Addtext(req.body.inputText,req.body.fontFamilyName,req.body.textForegroundColor);
          let data = renderBridgeText(req.body.inputText, false, req.body.textForegroundColor, req.body.fontFamilyName)
 
-         res.send(data)
+         // res.send(data)
+         setTimeout(() => {
+            // console.log(str);
+            res.send(str)
+         }, 8000)
       } else if (req.body.textShape == "foo-3") {
          let data = renderBridgeText(req.body.inputText, false, req.body.textForegroundColor, req.body.fontFamilyName);
-         res.send(data)
+         // res.send(data)
+         setTimeout(() => {
+            // console.log(str);
+            res.send(str)
+         }, 8000)
       } else if (req.body.textShape == "foo-perspective") {
          let data = renderBridgeText(req.body.inputText, true, req.body.textForegroundColor, req.body.fontFamilyName, 200, 50, 85, 0);
-         res.send(data)
+         // res.send(data)
+         setTimeout(() => {
+            // console.log(str);
+            res.send(str)
+         }, 8000)
       } else if (req.body.textShape == "foo-vally") {
          let data = renderBridgeText(req.body.inputText, false, req.body.textForegroundColor, req.body.fontFamilyName, 66, 51, 68, 200);
-         res.send(data)
+         // res.send(data)
+         setTimeout(() => {
+            // console.log(str);
+            res.send(str)
+         }, 8000)
       } else if (req.body.textShape == "foo-pinch") {
          let data = renderBridgeText(req.body.inputText, false, req.body.textForegroundColor, req.body.fontFamilyName, 66, 20, 65, 190);
-         res.send(data)
+         // res.send(data)
+         setTimeout(() => {
+            // console.log(str);
+            res.send(str)
+         }, 8000)
       }
-   }
+   }*/
 
 
 
