@@ -15,6 +15,8 @@
     "canvas": "^2.9.3",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
-    "fabric": "^5.2.1"
+    "fabric": "^5.2.1",
+    "nodemon": "^2.0.19",
+    "trim-canvas": "^0.1.2"
   }
 }
